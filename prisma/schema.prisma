@@ -24,6 +24,8 @@ model User {
   biography String?
   createdAt DateTime @default(now())
   posts Post[]
+  stories Story[]
+  viewedStories StoryView[]
 }
 
 model Post {
@@ -33,4 +35,23 @@ model Post {
   media String
   caption String?
   createdAt DateTime @default(now())
+}
+
+model Story {
+  id Int @default(autoincrement()) @id
+  author User @relation(fields: [authorId], references: [id])
+  authorId Int
+  media String
+  isAvailable Boolean
+  views StoryView[]
+  createdAt DateTime @default(now())
+}
+
+model StoryView {
+  id Int @default(autoincrement()) @id
+  story Story @relation(fields: [storyId], references: [id])
+  storyId Int
+  viewer User @relation(fields: [viewerId], references: [id])
+  viewerId Int
+  viewedAt DateTime @default(now())
 }
