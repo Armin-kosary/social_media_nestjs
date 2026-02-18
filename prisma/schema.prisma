@@ -29,6 +29,7 @@ model User {
   acts Notification[] @relation("NotificationActor")
   notifications Notification[] @relation("NotificationRecipient")
   comments Comment[]
+  likes Like[]
 }
 
 model Post {
@@ -38,6 +39,7 @@ model Post {
   media String
   caption String?
   comments Comment[]
+  likes Like[]
   createdAt DateTime @default(now())
 }
 
@@ -79,4 +81,13 @@ model Comment {
   postId Int
   content String
   postedAt DateTime @default(now())
+}
+
+model Like {
+  id Int @default(autoincrement()) @id
+  actor User @relation(fields: [actorId], references: [id])
+  actorId Int
+  post Post @relation(fields: [postId], references: [id])
+  postId Int
+  actedAt DateTime @default(now())
 }
