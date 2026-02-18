@@ -28,6 +28,7 @@ model User {
   viewedStories StoryView[]
   acts Notification[] @relation("NotificationActor")
   notifications Notification[] @relation("NotificationRecipient")
+  comments Comment[]
 }
 
 model Post {
@@ -36,6 +37,7 @@ model Post {
   authorId Int
   media String
   caption String?
+  comments Comment[]
   createdAt DateTime @default(now())
 }
 
@@ -67,4 +69,14 @@ model Notification {
   actor User @relation("NotificationActor", fields: [actorId], references: [id])
   actorId Int
   actedAt DateTime @default(now())
+}
+
+model Comment {
+  id Int @default(autoincrement()) @id
+  author User @relation(fields: [authorId], references: [id])
+  authorId Int
+  post Post @relation(fields: [postId], references: [id])
+  postId Int
+  content String
+  postedAt DateTime @default(now())
 }
