@@ -23,4 +23,14 @@ model User {
   name String?
   biography String?
   createdAt DateTime @default(now())
+  posts Post[]
+}
+
+model Post {
+  id Int @default(autoincrement()) @id
+  author User @relation(fields: [authorId], references: [id])
+  authorId Int
+  media String
+  caption String?
+  createdAt DateTime @default(now())
 }
