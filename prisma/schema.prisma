@@ -26,6 +26,8 @@ model User {
   posts Post[]
   stories Story[]
   viewedStories StoryView[]
+  acts Notification[] @relation("NotificationActor")
+  notifications Notification[] @relation("NotificationRecipient")
 }
 
 model Post {
@@ -54,4 +56,15 @@ model StoryView {
   viewer User @relation(fields: [viewerId], references: [id])
   viewerId Int
   viewedAt DateTime @default(now())
+}
+
+model Notification {
+  id Int @default(autoincrement()) @id
+  // type ( COMPLETE LATER )
+  refrence String?
+  recipient User @relation("NotificationRecipient", fields: [recipientId], references: [id])
+  recipientId Int
+  actor User @relation("NotificationActor", fields: [actorId], references: [id])
+  actorId Int
+  actedAt DateTime @default(now())
 }
