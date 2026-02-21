@@ -16,14 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerUserDto: RegisterUserDto) {
-    console.log(
-      process.env.DB_HOST,
-      Number(process.env.DB_PORT),
-      process.env.DB_USER,
-      process.env.DB_PASSWORD,
-      process.env.DB_NAME,
-    )
+  async register(registerUserDto: RegisterUserDto, file: string) {
     //   READ USERNAME FROM DB
     const existUsername = await this.prismaService.user.findUnique({
       where: { username: registerUserDto.username },
@@ -32,11 +25,11 @@ export class AuthService {
     //   THROW ERROR IF USERNAME WAS TAKEN
     if (existUsername) throw new BadRequestException('This username is taken')
 
-    //   CREATE NEW USER IF USERNAME IS AVAILABLE
+    //   CREATE NEW USER IF USERNAME IS AVAILABLE TO TAKE
     registerUserDto.password = await bcrypt.hash(registerUserDto.password, 10)
     const newUser = await this.prismaService.user.create({
-      data: registerUserDto,
-      select: { username: true, name: true, email: true },
+      data: { ...registerUserDto, profile: file },
+      select: { username: true, name: true, email: true, profile: true },
     })
     return newUser
   }
@@ -51,6 +44,7 @@ export class AuthService {
       throw new BadRequestException(
         `There is no user with username : ${loginUserDto.username}`,
       )
+
     //   VALIDATE PASSWORDS
     if (!(await bcrypt.compare(loginUserDto.password, user.password)))
       throw new UnauthorizedException('Password is incorrect')
