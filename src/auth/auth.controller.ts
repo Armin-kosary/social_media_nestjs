@@ -4,12 +4,16 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
+  UseGuards,
+  Request,
 } from '@nestjs/common'
 import { LoginUserDto } from './dto/login-user-dto'
 import { AuthService } from './auth.service'
 import { RegisterUserDto } from './dto/register-user.dto'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { multerProfileConfig } from './configs/profile-image.multer.config'
+import { RefreshTokenGuard } from './guards/refresh-token.guard'
+import { RefreshTokenDto } from './dto/refresh-token.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -31,5 +35,28 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginUserDto: LoginUserDto) {
     return await this.authService.login(loginUserDto)
+  }
+
+  @Post('refresh')
+  @UseGuards(RefreshTokenGuard)
+  async refresh(@Request() req) {
+    const token = req.headers.authorization?.replace('Bearer ', '') || ''
+    return await this.authService.refreshAccessToken(
+      req.user.sub,
+      req.user.username,
+      token,
+    )
+  }
+
+  @Post('logout')
+  @UseGuards(RefreshTokenGuard)
+  async logout(@Request() req) {
+    return await this.authService.logout(req.user.sub)
+  }
+
+  @Post('logout-all')
+  @UseGuards(RefreshTokenGuard)
+  async logoutAllDevices(@Request() req) {
+    return await this.authService.logoutAllDevices(req.user.sub)
   }
 }

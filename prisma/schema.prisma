@@ -31,6 +31,16 @@ model User {
   notifications Notification[] @relation("NotificationRecipient")
   comments Comment[]
   likes Like[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id Int @default(autoincrement()) @id
+  token String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model Post {
